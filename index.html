@@ -854,6 +854,30 @@ tbody tr:hover{background:var(--bg)}
             <div style="color:var(--text-light)">— Menunggu aktivitas —</div>
           </div>
         </div>
+
+        <!-- BACKUP & RESTORE -->
+        <div class="card" style="margin-top:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">💾 Backup & Restore Penuh</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">
+            Backup semua data (transaksi, produk, pengguna, pengaturan) ke satu file JSON. Gunakan untuk <strong>cadangan rutin</strong> atau <strong>pindah perangkat</strong>.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:6px">📤 Export Full Backup</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Download semua data ke file JSON. Data tidak ada yang dihapus.</div>
+              <button class="btn btn-primary" style="width:100%" onclick="backupData()">📤 Download Backup</button>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:6px">📥 Restore dari Backup</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Upload file backup. <strong style="color:var(--danger)">Semua data lokal akan ditimpa.</strong></div>
+              <button class="btn btn-danger" style="width:100%" onclick="document.getElementById('restore-file').click()">📥 Upload & Restore</button>
+              <input type="file" id="restore-file" accept=".json" class="hidden" onchange="restoreData(event)">
+            </div>
+          </div>
+          <div style="margin-top:12px;padding:10px 14px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;font-size:12px;color:#92400E">
+            ⚠️ <strong>Perbedaan Backup vs Sinkronisasi:</strong> Backup menimpa semua data. Sinkronisasi menggabungkan data secara cerdas. Gunakan Backup untuk cadangan rutin, gunakan Sinkronisasi untuk pertukaran data antar cabang.
+          </div>
+        </div>
       </div>
 
       <!-- SETTINGS PAGE -->
@@ -881,6 +905,11 @@ tbody tr:hover{background:var(--bg)}
                 <label class="form-label" id="st-currency-label">Mata Uang</label>
                 <input type="text" class="form-control" id="st-currency" value="Rp">
               </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Timeout Sesi Login (menit)</label>
+              <input type="number" class="form-control" id="st-session-timeout" value="0" min="0" max="1440" style="max-width:200px">
+              <div class="form-hint">Isi 0 = sesi tidak pernah berakhir (tetap login walau browser di-refresh). Contoh: isi 60 = otomatis logout setelah 1 jam tidak aktif.</div>
             </div>
             <div class="form-group">
               <label class="form-label" id="st-logo-label">Logo Aplikasi</label>
@@ -1634,11 +1663,25 @@ function doLogin(){
   if(pinVal.length!==6){toast('PIN harus 6 digit','warning');return}
   const users = DB.get('users')||[];
   const user = users.find(u=>u.username===username&&u.pin===pinVal&&u.active);
-  if(!user){toast('Username atau PIN salah!','error');pinVal='';for(let i=0;i<6;i++){const d=document.getElementById('pd'+i);if(d)d.classList.remove('filled');}return}
-  if(user.branchId!=='all'&&user.branchId!==branchId){toast('User tidak memiliki akses ke cabang ini','error');return}
+  if(!user){
+    toast('Username atau PIN salah!','error');
+    pinVal='';
+    for(let i=0;i<6;i++){const d=document.getElementById('pd'+i);if(d)d.classList.remove('filled');}
+    return;
+  }
+  if(user.branchId!=='all'&&user.branchId!==branchId){
+    toast('User tidak memiliki akses ke cabang ini','error');
+    return;
+  }
   currentUser = user;
   const branches = DB.get('branches')||[];
   currentBranch = branches.find(b=>b.id===branchId)||branches[0];
+  // ── Simpan session ke localStorage ──
+  DB.set('session',{
+    userId: user.id,
+    branchId: currentBranch?.id||branchId,
+    loginTime: new Date().toISOString()
+  });
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.remove('hidden');
   initApp();
@@ -3480,6 +3523,8 @@ function renderSettings(){
   const s=DB.get('settings')||{};
   document.getElementById('st-app-name').value=s.appName||'POSku';
   document.getElementById('st-currency').value=s.currency||'Rp';
+  if(document.getElementById('st-session-timeout'))
+    document.getElementById('st-session-timeout').value=s.sessionTimeout||0;
   document.getElementById('st-store-name').value=s.storeName||'';
   document.getElementById('st-store-phone').value=s.storePhone||'';
   document.getElementById('st-store-address').value=s.storeAddress||'';
@@ -3558,9 +3603,10 @@ function saveGeneralSettings(){
   const s=DB.get('settings')||{};
   s.appName=document.getElementById('st-app-name').value.trim()||'POSku';
   s.currency=document.getElementById('st-currency').value.trim()||'Rp';
+  s.sessionTimeout=parseInt(document.getElementById('st-session-timeout')?.value)||0;
   DB.set('settings',s);
   applySettings();
-  applyLang(); // refreshes login version text with new app name
+  applyLang();
   toast(t('settingsSaved'),'success');
 }
 function saveStoreSettings(){
@@ -3771,9 +3817,11 @@ function openChangePinModal(){
   openModal('confirm-modal');
 }
 function doLogout(){
-  currentUser=null;currentShift=null;
+  currentUser=null; currentShift=null;
   cart=[];
-  // Reset all nav items to visible (will be re-hidden on next login)
+  // Hapus session dari localStorage
+  DB.del('session');
+  // Reset semua nav items ke visible (akan di-hide ulang saat login berikutnya)
   document.querySelectorAll('.nav-item,.nav-section').forEach(el=>el.style.display='');
   document.getElementById('topbar-settings-btn').style.display='';
   document.getElementById('app').classList.add('hidden');
@@ -3781,7 +3829,6 @@ function doLogout(){
   pinVal='';
   document.getElementById('login-username').value='';
   for(let i=0;i<6;i++){const d=document.getElementById('pd'+i);if(d)d.classList.remove('filled')}
-  // Re-init login branch list in case branches changed
   initLogin();
   toast('Berhasil keluar','info');
 }
@@ -3817,9 +3864,50 @@ document.addEventListener('keydown',e=>{
 // ============================================================
 initData();
 initLogin();
+restoreSession();
 
 // Handle Enter key on login
 document.getElementById('login-username').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+// ============================================================
+// SESSION RESTORE — Auto login jika refresh browser
+// ============================================================
+function restoreSession(){
+  const session = DB.get('session');
+  if(!session) return; // Belum login sebelumnya
+
+  const users    = DB.get('users')||[];
+  const branches = DB.get('branches')||[];
+  const user     = users.find(u=>u.id===session.userId&&u.active);
+  const branch   = branches.find(b=>b.id===session.branchId)||branches[0];
+
+  if(!user||!branch){
+    // User/cabang sudah dihapus — hapus session basi
+    DB.del('session');
+    return;
+  }
+
+  // Cek pengaturan timeout session (default: tidak ada timeout = tetap login)
+  const s = DB.get('settings')||{};
+  if(s.sessionTimeout && s.sessionTimeout > 0){
+    const loginTime  = new Date(session.loginTime);
+    const minutesPassed = (Date.now()-loginTime)/60000;
+    if(minutesPassed > s.sessionTimeout){
+      // Session kadaluarsa
+      DB.del('session');
+      toast('Sesi login telah berakhir. Silakan login kembali.','warning',4000);
+      return;
+    }
+  }
+
+  // Pulihkan session
+  currentUser   = user;
+  currentBranch = branch;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.remove('hidden');
+  initApp();
+  // Tidak tampilkan toast agar tidak mengganggu
+}
 </script>
 </body>
 </html>

@@ -1,122 +1,134 @@
 # 📖 Panduan Upload POSku ke GitHub
 
-Panduan lengkap cara upload POSku ke GitHub dan aktifkan GitHub Pages — **tanpa perlu install apapun**, cukup browser.
+Cara upload POSku ke GitHub dan aktifkan GitHub Pages — **cukup pakai browser, tanpa install apapun**.
 
 ---
 
-## ⚡ Ringkasan Cepat (5 menit)
+## ⚡ Ringkasan (5 Menit)
 
 ```
-1. Buat akun GitHub (gratis) di github.com
-2. Buat repository baru → Public → Create
-3. Upload semua file dari folder ini
-4. Settings → Pages → main / root → Save
-5. Selesai! Akses di https://USERNAME.github.io/NAMA-REPO/
+1. Daftar/login di github.com
+2. Buat repository baru (Public)
+3. Upload semua file dari ZIP ini
+4. Settings → Pages → main/root → Save
+5. Akses di https://USERNAME.github.io/posku/
 ```
 
 ---
 
 ## 📋 Langkah Detail
 
-### Step 1 — Buat Akun GitHub
-Jika belum punya akun, daftar gratis di **[github.com/signup](https://github.com/signup)**
+### Step 1 — Persiapan File
+Extract file ZIP ini. Anda akan mendapatkan folder dengan isi:
+```
+posku-github/
+├── index.html        ← Wajib diupload
+├── README.md         ← Wajib diupload
+├── LICENSE           ← Wajib diupload
+├── .gitignore        ← Wajib diupload
+├── _config.yml       ← Wajib diupload
+└── PANDUAN_GITHUB.md ← Wajib diupload
+```
 
-### Step 2 — Buat Repository Baru
-1. Login ke GitHub
-2. Klik tombol **"+"** (pojok kanan atas) → **"New repository"**
-3. Isi:
+### Step 2 — Buat Repository GitHub
+1. Buka **[github.com](https://github.com)** → Login
+2. Klik **"+"** (pojok kanan atas) → **"New repository"**
+3. Isi form:
    - **Repository name**: `posku`
-   - **Description**: `Aplikasi POS berbasis web - offline ready`
+   - **Description**: `Aplikasi POS berbasis web`
    - Pilih: ✅ **Public**
    - Centang: ✅ **Add a README file**
 4. Klik **"Create repository"**
 
-### Step 3 — Upload File
+### Step 3 — Upload Semua File
 1. Di halaman repository → klik **"Add file"** → **"Upload files"**
 2. **Drag & drop** semua file berikut ke area upload:
-   - ✅ `index.html`
-   - ✅ `README.md`
-   - ✅ `LICENSE`
-   - ✅ `.gitignore`
-   - ✅ `_config.yml`
-   - ✅ `PANDUAN_GITHUB.md`
+   - `index.html`
+   - `README.md`
+   - `LICENSE`
+   - `.gitignore`
+   - `_config.yml`
+   - `PANDUAN_GITHUB.md`
+
+   > **Catatan:** File yang diawali titik (`.gitignore`) mungkin tidak terlihat di Windows.
+   > Aktifkan "Show hidden files" di File Explorer, atau upload satu per satu.
+
 3. Di bagian **"Commit changes"**:
-   - Tulis pesan: `Upload POSku v2.0.0`
+   - Pesan commit: `Upload POSku v2.0.0`
 4. Klik **"Commit changes"**
 
-> **Catatan folder `.github/`:** GitHub tidak bisa upload folder kosong lewat browser.
-> Folder `.github/ISSUE_TEMPLATE/` bisa diabaikan — tidak mempengaruhi aplikasi.
-
 ### Step 4 — Aktifkan GitHub Pages
-1. Klik tab **"Settings"** di repo Anda
-2. Di sidebar kiri, klik **"Pages"**
-3. Di bagian **"Build and deployment"**:
+1. Klik tab **"Settings"** di repo
+2. Sidebar kiri → klik **"Pages"**
+3. Di **"Build and deployment"**:
    - Source: **"Deploy from a branch"**
    - Branch: **"main"** | Folder: **"/ (root)"**
 4. Klik **"Save"**
 
 ### Step 5 — Akses Aplikasi
-Tunggu 1–3 menit, lalu refresh halaman Settings → Pages.
+Tunggu **1–3 menit**, lalu refresh halaman Settings → Pages.
 Akan muncul:
 ```
 ✅ Your site is live at https://USERNAME.github.io/posku/
 ```
 
-**Selesai!** 🎉 POSku sekarang bisa diakses dari mana saja.
+**Selesai! 🎉** Bookmark link tersebut di semua perangkat kasir.
 
 ---
 
-## 🔄 Update Aplikasi (Versi Baru)
+## 📱 Pasang di Home Screen (Tablet/HP)
+
+1. Buka link GitHub Pages di browser HP/tablet
+2. Menu browser → **"Add to Home Screen"** / **"Tambahkan ke Layar Utama"**
+3. POSku muncul seperti aplikasi di home screen
+
+---
+
+## 🔄 Update ke Versi Baru
 
 Saat ada file `index.html` baru:
 
-**Cara mudah (browser):**
+**Cara mudah lewat browser:**
 1. Buka repo di GitHub
-2. Klik file `index.html`
-3. Klik ikon **pensil** (✏️ Edit this file) di kanan atas
-4. Tekan **Ctrl+A** → hapus semua → paste isi file baru
-5. Klik **"Commit changes"** → **"Commit directly to main"**
-6. Tunggu 1–2 menit → GitHub Pages otomatis update
+2. Klik file `index.html` → klik ikon **✏️ Edit**
+3. Tekan **Ctrl+A** → hapus semua → **paste** isi file baru
+4. Klik **"Commit changes"** → GitHub Pages otomatis update
 
-**Cara upload ulang:**
-1. Hapus `index.html` lama (klik file → ikon tempat sampah)
-2. Upload `index.html` baru
-3. Commit
+**Atau upload ulang:**
+1. Hapus `index.html` lama (klik file → ikon 🗑️)
+2. Upload `index.html` baru → Commit
 
 ---
 
-## 🔄 Cara Sync Dua Arah Antar Perangkat
+## 🔄 Cara Sinkronisasi Dua Arah
 
-POSku punya fitur **Sinkronisasi Server ↔ Client** via file JSON:
+POSku punya sistem sync **Server ↔ Client** tanpa internet:
 
-### Setup Awal
-- **Perangkat Pusat/Admin** → buka Sinkronisasi → pilih **"Server / Pusat"**
-- **Perangkat Kasir/Cabang** → buka Sinkronisasi → pilih **"Client / Cabang"**
+### Setup Awal (sekali saja)
+- Perangkat kantor/admin → buka **Sinkronisasi** → pilih **"🖥️ Server / Pusat"**
+- Perangkat kasir/cabang → buka **Sinkronisasi** → pilih **"💻 Client / Cabang"**
 
-### Server mengirim update ke Client (produk baru, harga baru)
+### Server → Client (kirim update produk/harga/user)
 ```
-Server → "Export Data Master" → download file JSON
-         Kirim file ke kasir via WhatsApp / Drive / USB
-Client → "Terima dari Server" → upload file → Preview → "Terapkan Update"
-```
-
-### Client mengirim transaksi ke Server
-```
-Client → "Kirim ke Server" → download file JSON
-         Kirim file ke server via WhatsApp / Drive / USB
-Server → "Terima dari Client" → upload file → Preview → "Gabungkan Data"
+1. Server  : Sinkronisasi → "Export Data Master" → file JSON terdownload
+2. Kirim   : via WhatsApp / Google Drive / USB / email
+3. Client  : Sinkronisasi → "Terima dari Server" → upload file → Preview → "Terapkan Update"
 ```
 
-> ✅ Smart merge: transaksi duplikat otomatis dideteksi dan dilewati
+### Client → Server (kirim transaksi harian)
+```
+1. Client  : Sinkronisasi → "Kirim ke Server" → file JSON terdownload
+2. Kirim   : via WhatsApp / Google Drive / USB / email
+3. Server  : Sinkronisasi → "Terima dari Client" → upload file → Preview → "Gabungkan Data"
+```
 
----
+> ✅ **Smart merge**: transaksi duplikat otomatis dilewati, tidak ada data dobel
 
-## 📱 Tips Penggunaan di Tablet / HP
-
-Setelah GitHub Pages aktif:
-1. Buka link `https://USERNAME.github.io/posku/` di browser HP/tablet
-2. Klik menu browser → **"Add to Home Screen"** / **"Tambahkan ke Layar Utama"**
-3. POSku akan muncul seperti aplikasi di home screen!
+### Backup Penuh (cadangan rutin)
+```
+Sinkronisasi → bagian "Backup & Restore Penuh" → "Download Backup"
+```
+Simpan file backup di Google Drive / hard disk eksternal secara rutin.
 
 ---
 
@@ -124,16 +136,19 @@ Setelah GitHub Pages aktif:
 
 | Masalah | Solusi |
 |---|---|
-| GitHub Pages tidak muncul | Pastikan repo **Public**, tunggu 3–5 menit, cek tab **Actions** |
-| Halaman 404 | Pastikan file bernama tepat `index.html` (huruf kecil) |
-| Data hilang saat buka di browser lain | Data localStorage tidak dibagikan antar browser — gunakan fitur Sinkronisasi |
-| Logo tidak muncul | Logo tersimpan di localStorage, tidak ikut ke GitHub — upload ulang logo di Pengaturan |
+| GitHub Pages tidak aktif | Pastikan repo **Public**. Cek tab **Actions** — tunggu build selesai |
+| Halaman 404 | Pastikan nama file tepat: `index.html` (huruf kecil semua) |
+| Data hilang di browser lain | Data localStorage tidak dibagikan antar browser — gunakan fitur Sinkronisasi |
+| Logo hilang setelah sync | Logo tersimpan lokal — upload ulang di **Pengaturan → Umum → Upload Logo** |
+| Kembali ke login setelah refresh | Update ke versi terbaru — fitur session persist sudah diperbaiki di v2.0.0 |
+| `.gitignore` tidak terlihat | Di Windows: File Explorer → View → centang "Hidden items" |
 
 ---
 
 ## 🔗 Link Berguna
 
-- GitHub Signup: https://github.com/signup
-- GitHub Pages Docs: https://docs.github.com/pages
-- Git Download: https://git-scm.com/downloads
-
+| | |
+|---|---|
+| Daftar GitHub | https://github.com/signup |
+| Dokumentasi GitHub Pages | https://docs.github.com/pages |
+| Download Git (opsional) | https://git-scm.com/downloads |
