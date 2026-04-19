@@ -348,17 +348,98 @@ tbody tr:hover{background:var(--bg)}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}
 
-/* RESPONSIVE */
+/* RESPONSIVE SIDEBAR */
+
+/* Desktop (>1024px): sidebar always visible, toggle collapses to icon-only */
+#sidebar{
+  width:var(--sidebar-w);
+  background:var(--secondary);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  flex-shrink:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  transition:width .25s ease;
+  position:relative;
+  z-index:10;
+}
+#sidebar.collapsed{width:64px}
+#sidebar.collapsed .sidebar-title,
+#sidebar.collapsed .sidebar-branch,
+#sidebar.collapsed .nav-section-title,
+#sidebar.collapsed .nav-item span:not(.nav-icon),
+#sidebar.collapsed .nav-item .badge,
+#sidebar.collapsed .user-info,
+#sidebar.collapsed .user-name,
+#sidebar.collapsed .user-role,
+#sidebar.collapsed .sidebar-footer span:last-child{
+  display:none!important
+}
+#sidebar.collapsed .sidebar-header{justify-content:center;padding:20px 12px}
+#sidebar.collapsed .nav-item{justify-content:center;padding:10px 0}
+#sidebar.collapsed .nav-item .nav-icon{width:auto;font-size:20px}
+#sidebar.collapsed .sidebar-user{justify-content:center;padding:8px 0}
+#sidebar.collapsed .user-avatar{margin:0}
+#sidebar.collapsed .nav-section{margin-bottom:16px}
+
+/* Tablet (768px–1024px): starts collapsed, can expand */
+@media(max-width:1024px) and (min-width:769px){
+  :root{--sidebar-w:240px}
+  #sidebar{width:64px}
+  #sidebar.expanded{width:240px}
+  #sidebar:not(.expanded) .sidebar-title,
+  #sidebar:not(.expanded) .sidebar-branch,
+  #sidebar:not(.expanded) .nav-section-title,
+  #sidebar:not(.expanded) .nav-item span:not(.nav-icon),
+  #sidebar:not(.expanded) .nav-item .badge,
+  #sidebar:not(.expanded) .user-info,
+  #sidebar:not(.expanded) .sidebar-footer span:last-child{display:none!important}
+  #sidebar:not(.expanded) .sidebar-header{justify-content:center;padding:20px 12px}
+  #sidebar:not(.expanded) .nav-item{justify-content:center;padding:10px 0}
+  #sidebar:not(.expanded) .nav-item .nav-icon{width:auto;font-size:20px}
+  #sidebar:not(.expanded) .sidebar-user{justify-content:center;padding:8px 0}
+  #sidebar:not(.expanded) .user-avatar{margin:0}
+}
+
+/* Mobile (<768px): sidebar hidden, slides in as overlay with backdrop */
 @media(max-width:768px){
   :root{--sidebar-w:0px}
-  #sidebar{position:fixed;left:-240px;z-index:100;height:100%;transition:.3s}
-  #sidebar.mobile-open{left:0;width:240px}
+  #sidebar{
+    position:fixed;
+    left:-260px;
+    top:0;height:100%;
+    width:240px!important;
+    z-index:200;
+    box-shadow:none;
+    transition:left .25s ease, box-shadow .25s ease;
+  }
+  #sidebar.mobile-open{
+    left:0;
+    box-shadow:4px 0 24px rgba(0,0,0,.4);
+  }
+  /* All text visible when open on mobile */
+  #sidebar .sidebar-title,
+  #sidebar .sidebar-branch,
+  #sidebar .nav-section-title,
+  #sidebar .nav-item span,
+  #sidebar .user-info{display:''!important}
+  #sidebar-backdrop{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.45);
+    z-index:199;
+    backdrop-filter:blur(2px);
+  }
+  #sidebar-backdrop.visible{display:block}
   .grid-4{grid-template-columns:repeat(2,1fr)}
   .pos-right{width:320px}
 }
 @media(max-width:600px){
-  .pos-right{width:280px}
+  .pos-right{width:100%;border-left:none;border-top:1px solid var(--border)}
   .grid-3{grid-template-columns:1fr}
+  #pos-page{flex-direction:column}
+  .pos-left{overflow-y:auto;max-height:55vh}
 }
 
 /* EMPTY STATE */
@@ -461,6 +542,8 @@ tbody tr:hover{background:var(--bg)}
 
 <!-- MAIN APP -->
 <div id="app" class="hidden">
+  <!-- Mobile sidebar backdrop -->
+  <div id="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
   <!-- SIDEBAR -->
   <div id="sidebar">
     <div class="sidebar-header">
@@ -474,11 +557,11 @@ tbody tr:hover{background:var(--bg)}
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title" id="nav-main-label">Utama</div>
-        <div class="nav-item active" onclick="showPage('pos')" id="nav-pos">
+        <div class="nav-item active" onclick="showPage('pos');navItemClicked()" id="nav-pos">
           <span class="nav-icon">🛒</span>
           <span id="nav-pos-label">Kasir / POS</span>
         </div>
-        <div class="nav-item" onclick="showPage('dashboard')" id="nav-dashboard">
+        <div class="nav-item" onclick="showPage('dashboard');navItemClicked()" id="nav-dashboard">
           <span class="nav-icon">📊</span>
           <span id="nav-dash-label">Dashboard</span>
         </div>
@@ -486,15 +569,15 @@ tbody tr:hover{background:var(--bg)}
 
       <div class="nav-section" id="nav-management-section">
         <div class="nav-section-title" id="nav-mgmt-label">Manajemen</div>
-        <div class="nav-item" onclick="showPage('products')" id="nav-products">
+        <div class="nav-item" onclick="showPage('products');navItemClicked()" id="nav-products">
           <span class="nav-icon">📦</span>
           <span id="nav-prod-label">Produk</span>
         </div>
-        <div class="nav-item" onclick="showPage('categories')" id="nav-categories">
+        <div class="nav-item" onclick="showPage('categories');navItemClicked()" id="nav-categories">
           <span class="nav-icon">🏷️</span>
           <span id="nav-cat-label">Kategori</span>
         </div>
-        <div class="nav-item" onclick="showPage('transactions')" id="nav-transactions">
+        <div class="nav-item" onclick="showPage('transactions');navItemClicked()" id="nav-transactions">
           <span class="nav-icon">💳</span>
           <span id="nav-trans-label">Transaksi</span>
         </div>
@@ -502,11 +585,11 @@ tbody tr:hover{background:var(--bg)}
 
       <div class="nav-section" id="nav-reports-section">
         <div class="nav-section-title" id="nav-reports-label">Laporan</div>
-        <div class="nav-item" onclick="showPage('reports')" id="nav-reports">
+        <div class="nav-item" onclick="showPage('reports');navItemClicked()" id="nav-reports">
           <span class="nav-icon">📈</span>
           <span id="nav-rep-label">Laporan Penjualan</span>
         </div>
-        <div class="nav-item" onclick="showPage('shifts')" id="nav-shifts">
+        <div class="nav-item" onclick="showPage('shifts');navItemClicked()" id="nav-shifts">
           <span class="nav-icon">⏰</span>
           <span id="nav-shift-label">Manajemen Shift</span>
         </div>
@@ -514,19 +597,19 @@ tbody tr:hover{background:var(--bg)}
 
       <div class="nav-section" id="nav-admin-section">
         <div class="nav-section-title" id="nav-admin-label">Administrasi</div>
-        <div class="nav-item" onclick="showPage('users')" id="nav-users">
+        <div class="nav-item" onclick="showPage('users');navItemClicked()" id="nav-users">
           <span class="nav-icon">👥</span>
           <span id="nav-user-label">Pengguna</span>
         </div>
-        <div class="nav-item" onclick="showPage('branches')" id="nav-branches">
+        <div class="nav-item" onclick="showPage('branches');navItemClicked()" id="nav-branches">
           <span class="nav-icon">🏪</span>
           <span id="nav-branch-label">Cabang</span>
         </div>
-        <div class="nav-item" onclick="showPage('sync')" id="nav-sync">
+        <div class="nav-item" onclick="showPage('sync');navItemClicked()" id="nav-sync">
           <span class="nav-icon">🔄</span>
           <span id="nav-sync-label">Sinkronisasi Data</span>
         </div>
-        <div class="nav-item" onclick="showPage('settings')" id="nav-settings">
+        <div class="nav-item" onclick="showPage('settings');navItemClicked()" id="nav-settings">
           <span class="nav-icon">⚙️</span>
           <span id="nav-settings-label">Pengaturan</span>
         </div>
@@ -552,14 +635,14 @@ tbody tr:hover{background:var(--bg)}
       <button class="topbar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">☰</button>
       <div class="topbar-title" id="topbar-title">Kasir / POS</div>
       <div class="topbar-actions">
-        <div id="shift-status-badge" class="shift-badge inactive" onclick="hasPermission('shifts')?showPage('shifts'):showPage('pos')" style="cursor:pointer">
+        <div id="shift-status-badge" class="shift-badge inactive" onclick="hasPermission('shifts')?showPage('shifts'):showPage('pos');navItemClicked()" style="cursor:pointer">
           <span id="shift-badge-text">⚡ Mulai Shift</span>
         </div>
         <div style="display:flex;gap:4px" id="lang-switcher">
           <button class="lang-btn active" onclick="setLang('id')" id="lang-id">ID</button>
           <button class="lang-btn" onclick="setLang('en')" id="lang-en">EN</button>
         </div>
-        <button class="topbar-btn" id="topbar-settings-btn" onclick="showPage('settings')">⚙️</button>
+        <button class="topbar-btn" id="topbar-settings-btn" onclick="showPage('settings');navItemClicked()">⚙️</button>
         <button class="topbar-btn" onclick="doLogout()" id="logout-btn">🚪 <span id="logout-label">Keluar</span></button>
       </div>
     </div>
@@ -1891,10 +1974,62 @@ function showPage(page){
   if(titles[page]) document.getElementById('topbar-title').textContent=titles[page];
 }
 
+function isMobile(){ return window.innerWidth <= 768; }
+function isTablet(){ return window.innerWidth > 768 && window.innerWidth <= 1024; }
+function isDesktop(){ return window.innerWidth > 1024; }
+
 function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('collapsed');
-  document.getElementById('sidebar').classList.toggle('mobile-open');
+  const sidebar = document.getElementById('sidebar');
+  if(isMobile()){
+    // Mobile: toggle overlay
+    const isOpen = sidebar.classList.contains('mobile-open');
+    if(isOpen){ closeMobileSidebar(); }
+    else { openMobileSidebar(); }
+  } else if(isTablet()){
+    // Tablet: toggle expanded/collapsed icon-only
+    sidebar.classList.toggle('expanded');
+  } else {
+    // Desktop: toggle collapsed icon-only
+    sidebar.classList.toggle('collapsed');
+  }
 }
+
+function openMobileSidebar(){
+  const sidebar   = document.getElementById('sidebar');
+  const backdrop  = document.getElementById('sidebar-backdrop');
+  sidebar.classList.add('mobile-open');
+  backdrop.classList.add('visible');
+  document.body.style.overflow = 'hidden'; // prevent scroll behind
+}
+
+function closeMobileSidebar(){
+  const sidebar   = document.getElementById('sidebar');
+  const backdrop  = document.getElementById('sidebar-backdrop');
+  sidebar.classList.remove('mobile-open');
+  backdrop.classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+// Close mobile sidebar automatically when a nav item is clicked
+function navItemClicked(){
+  if(isMobile()) closeMobileSidebar();
+}
+
+// Handle resize: clean up classes if resizing between breakpoints
+window.addEventListener('resize', ()=>{
+  const sidebar = document.getElementById('sidebar');
+  if(isDesktop()){
+    sidebar.classList.remove('mobile-open','expanded');
+    document.getElementById('sidebar-backdrop').classList.remove('visible');
+    document.body.style.overflow = '';
+  } else if(isTablet()){
+    sidebar.classList.remove('mobile-open','collapsed');
+    document.getElementById('sidebar-backdrop').classList.remove('visible');
+    document.body.style.overflow = '';
+  } else {
+    sidebar.classList.remove('collapsed','expanded');
+  }
+});
 
 // ============================================================
 // POS / KASIR
