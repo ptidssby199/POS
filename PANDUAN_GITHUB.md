@@ -1,149 +1,139 @@
-# 📖 Panduan Upload ke GitHub
+# 📖 Panduan Upload POSku ke GitHub
 
-Panduan lengkap cara mengupload POSku ke GitHub dan mengaktifkan GitHub Pages.
-
----
-
-## 📋 Prasyarat
-
-- Akun GitHub (gratis di [github.com](https://github.com))
-- Git terinstall di komputer ([download](https://git-scm.com/downloads)) **— ATAU —**
-- Cukup pakai browser saja (tanpa install Git)
+Panduan lengkap cara upload POSku ke GitHub dan aktifkan GitHub Pages — **tanpa perlu install apapun**, cukup browser.
 
 ---
 
-## 🌐 Cara A — Upload Lewat Browser (Termudah)
+## ⚡ Ringkasan Cepat (5 menit)
 
-### Langkah 1: Buat Repository Baru
-1. Login ke [github.com](https://github.com)
-2. Klik tombol **"+"** di kanan atas → **"New repository"**
-3. Isi form:
-   - **Repository name**: `posku` (atau nama lain)
-   - **Description**: `Aplikasi POS berbasis web - offline`
-   - Pilih **Public** (supaya bisa pakai GitHub Pages gratis)
-   - ✅ Centang **"Add a README file"**
+```
+1. Buat akun GitHub (gratis) di github.com
+2. Buat repository baru → Public → Create
+3. Upload semua file dari folder ini
+4. Settings → Pages → main / root → Save
+5. Selesai! Akses di https://USERNAME.github.io/NAMA-REPO/
+```
+
+---
+
+## 📋 Langkah Detail
+
+### Step 1 — Buat Akun GitHub
+Jika belum punya akun, daftar gratis di **[github.com/signup](https://github.com/signup)**
+
+### Step 2 — Buat Repository Baru
+1. Login ke GitHub
+2. Klik tombol **"+"** (pojok kanan atas) → **"New repository"**
+3. Isi:
+   - **Repository name**: `posku`
+   - **Description**: `Aplikasi POS berbasis web - offline ready`
+   - Pilih: ✅ **Public**
+   - Centang: ✅ **Add a README file**
 4. Klik **"Create repository"**
 
-### Langkah 2: Upload File
-1. Di halaman repository baru, klik **"Add file" → "Upload files"**
-2. **Drag & drop** semua file dari folder `posku-github` ke area upload:
-   - `index.html`
-   - `README.md`
-   - `LICENSE`
-   - `.gitignore`
+### Step 3 — Upload File
+1. Di halaman repository → klik **"Add file"** → **"Upload files"**
+2. **Drag & drop** semua file berikut ke area upload:
+   - ✅ `index.html`
+   - ✅ `README.md`
+   - ✅ `LICENSE`
+   - ✅ `.gitignore`
+   - ✅ `_config.yml`
+   - ✅ `PANDUAN_GITHUB.md`
 3. Di bagian **"Commit changes"**:
    - Tulis pesan: `Upload POSku v2.0.0`
 4. Klik **"Commit changes"**
 
-### Langkah 3: Aktifkan GitHub Pages
-1. Masuk ke **Settings** (tab di menu repo)
-2. Scroll ke bagian **"Pages"** di sidebar kiri
-3. Di **"Source"**: pilih **"Deploy from a branch"**
-4. Branch: pilih **"main"** → Folder: **"/ (root)"**
-5. Klik **"Save"**
-6. Tunggu 1–3 menit
-7. Refresh halaman — akan muncul link:
-   ```
-   ✅ Your site is live at https://USERNAME.github.io/posku/
-   ```
+> **Catatan folder `.github/`:** GitHub tidak bisa upload folder kosong lewat browser.
+> Folder `.github/ISSUE_TEMPLATE/` bisa diabaikan — tidak mempengaruhi aplikasi.
+
+### Step 4 — Aktifkan GitHub Pages
+1. Klik tab **"Settings"** di repo Anda
+2. Di sidebar kiri, klik **"Pages"**
+3. Di bagian **"Build and deployment"**:
+   - Source: **"Deploy from a branch"**
+   - Branch: **"main"** | Folder: **"/ (root)"**
+4. Klik **"Save"**
+
+### Step 5 — Akses Aplikasi
+Tunggu 1–3 menit, lalu refresh halaman Settings → Pages.
+Akan muncul:
+```
+✅ Your site is live at https://USERNAME.github.io/posku/
+```
+
+**Selesai!** 🎉 POSku sekarang bisa diakses dari mana saja.
 
 ---
 
-## 💻 Cara B — Lewat Git (Command Line)
+## 🔄 Update Aplikasi (Versi Baru)
 
-### Langkah 1: Inisialisasi Git di folder
-```bash
-# Masuk ke folder project
-cd posku-github
+Saat ada file `index.html` baru:
 
-# Inisialisasi git
-git init
-
-# Tambahkan semua file
-git add .
-
-# Commit pertama
-git commit -m "Initial commit: POSku v2.0.0"
-```
-
-### Langkah 2: Buat repo di GitHub dan hubungkan
-```bash
-# Hubungkan ke repo GitHub (ganti USERNAME dan REPONAME)
-git remote add origin https://github.com/USERNAME/REPONAME.git
-
-# Rename branch ke main
-git branch -M main
-
-# Push ke GitHub
-git push -u origin main
-```
-
-### Langkah 3: Aktifkan GitHub Pages
-Sama seperti Cara A Langkah 3 di atas.
-
----
-
-## 🔄 Cara Update Aplikasi
-
-Setelah ada versi baru:
-
-**Lewat browser:**
+**Cara mudah (browser):**
 1. Buka repo di GitHub
 2. Klik file `index.html`
-3. Klik ikon pensil (Edit)
-4. Hapus semua isi → paste isi file baru
-5. Klik **"Commit changes"**
+3. Klik ikon **pensil** (✏️ Edit this file) di kanan atas
+4. Tekan **Ctrl+A** → hapus semua → paste isi file baru
+5. Klik **"Commit changes"** → **"Commit directly to main"**
+6. Tunggu 1–2 menit → GitHub Pages otomatis update
 
-**Lewat Git:**
-```bash
-# Salin file baru ke folder
-cp /path/ke/POSku_baru.html index.html
-
-# Add & commit
-git add index.html
-git commit -m "Update POSku ke v2.1.0"
-git push
-```
+**Cara upload ulang:**
+1. Hapus `index.html` lama (klik file → ikon tempat sampah)
+2. Upload `index.html` baru
+3. Commit
 
 ---
 
-## 🔗 Hasil Akhir
+## 🔄 Cara Sync Dua Arah Antar Perangkat
 
-Setelah selesai, aplikasi POSku bisa diakses di:
+POSku punya fitur **Sinkronisasi Server ↔ Client** via file JSON:
 
+### Setup Awal
+- **Perangkat Pusat/Admin** → buka Sinkronisasi → pilih **"Server / Pusat"**
+- **Perangkat Kasir/Cabang** → buka Sinkronisasi → pilih **"Client / Cabang"**
+
+### Server mengirim update ke Client (produk baru, harga baru)
 ```
-https://USERNAME.github.io/NAMA-REPO/
+Server → "Export Data Master" → download file JSON
+         Kirim file ke kasir via WhatsApp / Drive / USB
+Client → "Terima dari Server" → upload file → Preview → "Terapkan Update"
 ```
 
-Contoh: `https://tokosaya.github.io/posku/`
+### Client mengirim transaksi ke Server
+```
+Client → "Kirim ke Server" → download file JSON
+         Kirim file ke server via WhatsApp / Drive / USB
+Server → "Terima dari Client" → upload file → Preview → "Gabungkan Data"
+```
 
-Link ini bisa:
-- Dibuka di browser tablet/PC/HP
-- Dibookmark di home screen
-- Dibagikan ke kasir
+> ✅ Smart merge: transaksi duplikat otomatis dideteksi dan dilewati
 
 ---
 
-## 💡 Tips
+## 📱 Tips Penggunaan di Tablet / HP
 
-- **Bookmark** halaman GitHub Pages di semua perangkat kasir
-- Di Android/iOS, buka di browser lalu **"Add to Home Screen"** agar terasa seperti aplikasi
-- Data tersimpan di browser masing-masing — backup rutin via **Sinkronisasi → Export Data**
-- Untuk multi-cabang, setiap cabang bisa pakai file yang sama, data terpisah per browser
+Setelah GitHub Pages aktif:
+1. Buka link `https://USERNAME.github.io/posku/` di browser HP/tablet
+2. Klik menu browser → **"Add to Home Screen"** / **"Tambahkan ke Layar Utama"**
+3. POSku akan muncul seperti aplikasi di home screen!
 
 ---
 
 ## ❓ Troubleshooting
 
-**GitHub Pages tidak muncul:**
-- Pastikan repository bersifat **Public**
-- Tunggu beberapa menit setelah save settings
-- Cek tab **Actions** di repo — pastikan build berhasil (ikon ✅)
+| Masalah | Solusi |
+|---|---|
+| GitHub Pages tidak muncul | Pastikan repo **Public**, tunggu 3–5 menit, cek tab **Actions** |
+| Halaman 404 | Pastikan file bernama tepat `index.html` (huruf kecil) |
+| Data hilang saat buka di browser lain | Data localStorage tidak dibagikan antar browser — gunakan fitur Sinkronisasi |
+| Logo tidak muncul | Logo tersimpan di localStorage, tidak ikut ke GitHub — upload ulang logo di Pengaturan |
 
-**File tidak ter-upload:**
-- Pastikan nama file persis `index.html` (huruf kecil semua)
-- Coba upload ulang jika gagal
+---
 
-**Aplikasi tidak terbuka:**
-- Pastikan URL-nya benar: `https://USERNAME.github.io/REPONAME/`
-- Coba buka di browser Chrome terlebih dahulu
+## 🔗 Link Berguna
+
+- GitHub Signup: https://github.com/signup
+- GitHub Pages Docs: https://docs.github.com/pages
+- Git Download: https://git-scm.com/downloads
+

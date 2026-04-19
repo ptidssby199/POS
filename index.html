@@ -718,29 +718,140 @@ tbody tr:hover{background:var(--bg)}
 
       <!-- SYNC PAGE -->
       <div class="page" id="sync-page">
-        <div class="card-header">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
           <div>
-            <div class="card-title" id="sync-page-title">Sinkronisasi Data</div>
-            <div class="card-subtitle" id="sync-page-sub">Backup & restore data secara manual antar cabang</div>
+            <div style="font-size:22px;font-weight:800" id="sync-page-title">Sinkronisasi Data</div>
+            <div style="font-size:13px;color:var(--text-muted)" id="sync-page-sub">Sinkronisasi dua arah antar perangkat / cabang</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div id="sync-mode-badge" style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE">⚙️ Mode: —</div>
           </div>
         </div>
-        <div class="grid-2" style="margin-bottom:16px">
-          <div class="sync-card" onclick="backupData()">
-            <div class="sync-icon">📤</div>
-            <div style="font-size:18px;font-weight:700;margin-bottom:6px" id="backup-label">Export / Backup Data</div>
-            <div style="font-size:13px;color:var(--text-muted)" id="backup-sub">Download semua data ke file JSON</div>
+
+        <!-- MODE SELECTOR -->
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">🔧 Pilih Peran Perangkat Ini</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div id="mode-server-card" onclick="setSyncMode('server')" style="border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.15s">
+              <div style="font-size:28px;margin-bottom:8px">🖥️</div>
+              <div style="font-weight:800;font-size:15px;margin-bottom:4px">Server / Pusat</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5">Perangkat ini sebagai pusat data. Export paket data master untuk dikirim ke client.</div>
+            </div>
+            <div id="mode-client-card" onclick="setSyncMode('client')" style="border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.15s">
+              <div style="font-size:28px;margin-bottom:8px">💻</div>
+              <div style="font-weight:800;font-size:15px;margin-bottom:4px">Client / Cabang</div>
+              <div style="font-size:12px;color:var(--text-muted);line-height:1.5">Perangkat ini sebagai cabang. Upload data ke server, atau ambil update dari server.</div>
+            </div>
           </div>
-          <div class="sync-card" onclick="document.getElementById('restore-file').click()">
-            <div class="sync-icon">📥</div>
-            <div style="font-size:18px;font-weight:700;margin-bottom:6px" id="restore-label">Import / Restore Data</div>
-            <div style="font-size:13px;color:var(--text-muted)" id="restore-sub">Upload file backup JSON</div>
-          </div>
-          <input type="file" id="restore-file" accept=".json" class="hidden" onchange="restoreData(event)">
         </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title" id="sync-log-title">Log Sinkronisasi</div></div>
-          <div id="sync-log" style="font-family:var(--mono);font-size:12px;background:var(--bg);border-radius:8px;padding:12px;min-height:80px;max-height:200px;overflow-y:auto;color:var(--text-muted)">
-            <div>Menunggu aktivitas...</div>
+
+        <!-- SERVER PANEL -->
+        <div id="sync-server-panel" class="hidden">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+            <!-- EXPORT MASTER -->
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                <div style="width:40px;height:40px;border-radius:10px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📤</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px">Export Data Master</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Kirim ke semua client</div>
+                </div>
+              </div>
+              <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">Download paket data master (produk, kategori, pengaturan, user). Client akan menerima update ini.</div>
+              <div style="margin-bottom:12px">
+                <div style="font-size:12px;font-weight:600;margin-bottom:8px">Pilih data yang diexport:</div>
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px;cursor:pointer"><input type="checkbox" id="exp-settings" checked> Pengaturan & Logo</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px;cursor:pointer"><input type="checkbox" id="exp-products" checked> Produk & Kategori</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px;cursor:pointer"><input type="checkbox" id="exp-users" checked> Data Pengguna</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="exp-branches" checked> Data Cabang</label>
+              </div>
+              <button class="btn btn-primary" style="width:100%" onclick="exportMaster()">📤 Export Data Master</button>
+            </div>
+
+            <!-- IMPORT CLIENT DATA -->
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                <div style="width:40px;height:40px;border-radius:10px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📥</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px">Terima Data dari Client</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Gabungkan transaksi cabang</div>
+                </div>
+              </div>
+              <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">Upload file data yang dikirim oleh client/cabang. Transaksi baru akan digabung ke data pusat tanpa menimpa data lama.</div>
+              <div id="server-import-preview" class="hidden" style="background:var(--bg);border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px"></div>
+              <button class="btn btn-success" style="width:100%;margin-bottom:8px" onclick="document.getElementById('server-import-file').click()">📂 Pilih File dari Client</button>
+              <input type="file" id="server-import-file" accept=".json" class="hidden" onchange="previewClientData(event)">
+              <button class="btn btn-secondary" style="width:100%;font-size:12px" id="server-merge-btn" onclick="mergeClientData()" disabled>🔀 Gabungkan Data Sekarang</button>
+            </div>
+          </div>
+
+          <!-- SERVER STATS -->
+          <div class="card">
+            <div style="font-weight:700;font-size:14px;margin-bottom:12px">📊 Status Data Pusat</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="server-stats"></div>
+          </div>
+        </div>
+
+        <!-- CLIENT PANEL -->
+        <div id="sync-client-panel" class="hidden">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+            <!-- UPLOAD TO SERVER -->
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                <div style="width:40px;height:40px;border-radius:10px;background:#FDF4FF;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📤</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px">Kirim ke Server</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Upload transaksi baru ke pusat</div>
+                </div>
+              </div>
+              <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">Export paket data cabang ini (transaksi & shift terbaru) untuk dikirim ke server/pusat.</div>
+              <div id="client-last-sync" style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:var(--text-muted)">
+                <div style="font-weight:600;margin-bottom:4px">Data yang akan dikirim:</div>
+                <div id="client-pending-info">Menghitung...</div>
+              </div>
+              <div style="margin-bottom:12px">
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+                  <input type="checkbox" id="client-only-new" checked>
+                  <span>Hanya data baru (sejak sync terakhir)</span>
+                </label>
+              </div>
+              <button class="btn btn-primary" style="width:100%" onclick="exportForServer()">📤 Export untuk Server</button>
+            </div>
+
+            <!-- RECEIVE FROM SERVER -->
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                <div style="width:40px;height:40px;border-radius:10px;background:#FFFBEB;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📥</div>
+                <div>
+                  <div style="font-weight:700;font-size:14px">Terima dari Server</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Update produk & pengaturan terbaru</div>
+                </div>
+              </div>
+              <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">Upload file data master dari server. Produk, kategori, dan pengaturan akan diperbarui.</div>
+              <div id="client-import-preview" class="hidden" style="background:var(--bg);border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px"></div>
+              <button class="btn btn-warning" style="width:100%;margin-bottom:8px;color:#fff" onclick="document.getElementById('client-import-file').click()">📂 Pilih File dari Server</button>
+              <input type="file" id="client-import-file" accept=".json" class="hidden" onchange="previewServerData(event)">
+              <button class="btn btn-secondary" style="width:100%;font-size:12px" id="client-apply-btn" onclick="applyServerData()" disabled>✅ Terapkan Update</button>
+            </div>
+          </div>
+
+          <!-- SYNC HISTORY -->
+          <div class="card">
+            <div style="font-weight:700;font-size:14px;margin-bottom:12px">🕐 Riwayat Sinkronisasi</div>
+            <div id="sync-history-list" style="font-size:13px"></div>
+          </div>
+        </div>
+
+        <!-- LOG -->
+        <div class="card" style="margin-top:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-weight:700;font-size:14px" id="sync-log-title">📋 Log Aktivitas</div>
+            <button class="btn btn-secondary btn-sm" onclick="clearSyncLog()">Hapus Log</button>
+          </div>
+          <div id="sync-log" style="font-family:var(--mono);font-size:11px;background:var(--bg);border-radius:8px;padding:12px;min-height:60px;max-height:180px;overflow-y:auto;color:var(--text-muted);line-height:1.8">
+            <div style="color:var(--text-light)">— Menunggu aktivitas —</div>
           </div>
         </div>
       </div>
@@ -2950,28 +3061,392 @@ function deleteBranch(id){
 // ============================================================
 // SYNC / BACKUP / RESTORE
 // ============================================================
+// ============================================================
+// SYNC ENGINE — BIDIRECTIONAL (SERVER ↔ CLIENT)
+// ============================================================
+
+let syncMode = DB.get('sync_mode') || null;   // 'server' | 'client'
+let pendingServerData = null;   // staged server import
+let pendingClientData = null;   // staged client import
+
 function renderSync(){
-  const s=DB.get('settings')||{};
-  document.getElementById('backup-label').textContent=t('backupLabel');
-  document.getElementById('backup-sub').textContent=t('backupSub');
-  document.getElementById('restore-label').textContent=t('restoreLabel');
-  document.getElementById('restore-sub').textContent=t('restoreSub');
+  // Restore last mode
+  syncMode = DB.get('sync_mode') || null;
+  if(syncMode) setSyncMode(syncMode, false);
+  else renderSyncIdle();
+  renderSyncHistory();
 }
+
+function renderSyncIdle(){
+  document.getElementById('sync-server-panel').classList.add('hidden');
+  document.getElementById('sync-client-panel').classList.add('hidden');
+  document.getElementById('sync-mode-badge').textContent = '⚙️ Mode: Belum dipilih';
+  document.getElementById('mode-server-card').style.borderColor = 'var(--border)';
+  document.getElementById('mode-client-card').style.borderColor = 'var(--border)';
+  document.getElementById('mode-server-card').style.background = '';
+  document.getElementById('mode-client-card').style.background = '';
+}
+
+function setSyncMode(mode, save=true){
+  syncMode = mode;
+  if(save) DB.set('sync_mode', mode);
+
+  // Reset card styles
+  document.getElementById('mode-server-card').style.borderColor = 'var(--border)';
+  document.getElementById('mode-client-card').style.borderColor = 'var(--border)';
+  document.getElementById('mode-server-card').style.background = '';
+  document.getElementById('mode-client-card').style.background = '';
+
+  if(mode === 'server'){
+    document.getElementById('mode-server-card').style.borderColor = 'var(--primary)';
+    document.getElementById('mode-server-card').style.background = 'var(--primary-light)';
+    document.getElementById('sync-mode-badge').innerHTML = '🖥️ Mode: <strong>Server / Pusat</strong>';
+    document.getElementById('sync-server-panel').classList.remove('hidden');
+    document.getElementById('sync-client-panel').classList.add('hidden');
+    renderServerStats();
+  } else {
+    document.getElementById('mode-client-card').style.borderColor = 'var(--primary)';
+    document.getElementById('mode-client-card').style.background = 'var(--primary-light)';
+    document.getElementById('sync-mode-badge').innerHTML = '💻 Mode: <strong>Client / Cabang</strong>';
+    document.getElementById('sync-client-panel').classList.remove('hidden');
+    document.getElementById('sync-server-panel').classList.add('hidden');
+    renderClientPendingInfo();
+  }
+}
+
+// ── SERVER FUNCTIONS ─────────────────────────────────────────
+
+function renderServerStats(){
+  const txns  = DB.get('transactions') || [];
+  const prods = DB.get('products') || [];
+  const users = DB.get('users') || [];
+  const shifts= DB.get('shifts') || [];
+  const el = document.getElementById('server-stats');
+  if(!el) return;
+  el.innerHTML = [
+    ['💳', 'Transaksi', txns.length],
+    ['📦', 'Produk', prods.length],
+    ['👥', 'Pengguna', users.length],
+    ['⏰', 'Shift', shifts.length],
+  ].map(([ic,lb,val])=>`
+    <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:20px;margin-bottom:4px">${ic}</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">${lb}</div>
+      <div style="font-size:18px;font-weight:800">${val}</div>
+    </div>`).join('');
+}
+
+function exportMaster(){
+  const inclSettings = document.getElementById('exp-settings').checked;
+  const inclProducts = document.getElementById('exp-products').checked;
+  const inclUsers    = document.getElementById('exp-users').checked;
+  const inclBranches = document.getElementById('exp-branches').checked;
+
+  const cats = DB.get('categories') || [];
+  const pkg = {
+    meta:{
+      type:'master',
+      version:'2.0.0',
+      app:'POSku',
+      exportDate: new Date().toISOString(),
+      exportedBy: currentUser?.name || '',
+      branchId: currentBranch?.id || 'b1',
+      branchName: currentBranch?.name || '',
+    }
+  };
+  if(inclSettings) pkg.settings   = DB.get('settings');
+  if(inclProducts){ pkg.products  = DB.get('products'); pkg.categories = cats; }
+  if(inclUsers)    pkg.users      = DB.get('users');
+  if(inclBranches) pkg.branches   = DB.get('branches');
+
+  const fname = `posku_master_${new Date().toISOString().slice(0,10)}.json`;
+  downloadFile(fname, JSON.stringify(pkg, null, 2), 'application/json');
+  addSyncLog(`📤 [SERVER] Export master → ${fname}`);
+  // Save last export timestamp
+  const sh = DB.get('sync_history') || [];
+  sh.unshift({type:'server-export', date:new Date().toISOString(), desc:`Export master → ${fname}`, by:currentUser?.name||''});
+  DB.set('sync_history', sh.slice(0,50));
+  renderSyncHistory();
+  toast('Data master berhasil diexport!', 'success');
+}
+
+function previewClientData(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(data.meta?.type !== 'client'){
+        toast('Bukan file dari client! Pastikan pakai "Export untuk Server"', 'error');
+        e.target.value=''; return;
+      }
+      pendingClientData = data;
+      // Show preview
+      const newTxns  = (data.transactions||[]).length;
+      const newShifts= (data.shifts||[]).length;
+      const existTxns= DB.get('transactions')||[];
+      const dupes = (data.transactions||[]).filter(t=>existTxns.find(x=>x.id===t.id)).length;
+      const fresh = newTxns - dupes;
+
+      document.getElementById('server-import-preview').innerHTML = `
+        <div style="font-weight:700;margin-bottom:6px;color:var(--text)">📋 Preview dari: ${data.meta.branchName||data.meta.branchId}</div>
+        <div style="color:var(--text-muted)">Tanggal export: ${new Date(data.meta.exportDate).toLocaleString('id-ID')}</div>
+        <div style="color:var(--text-muted)">Dikirim oleh: ${data.meta.exportedBy||'-'}</div>
+        <hr style="margin:8px 0;border:none;border-top:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+          <div>Transaksi baru: <strong style="color:var(--success)">${fresh}</strong></div>
+          <div>Duplikat (dilewati): <strong style="color:var(--text-muted)">${dupes}</strong></div>
+          <div>Shift: <strong>${newShifts}</strong></div>
+          <div>Cabang: <strong>${data.meta.branchName||'-'}</strong></div>
+        </div>
+        ${fresh===0?'<div style="margin-top:6px;color:var(--warning);font-weight:600">⚠️ Tidak ada transaksi baru</div>':''}
+      `;
+      document.getElementById('server-import-preview').classList.remove('hidden');
+      document.getElementById('server-merge-btn').disabled = false;
+      addSyncLog(`📂 [SERVER] File client dibaca: ${file.name} (${fresh} transaksi baru)`);
+    }catch{
+      toast('Gagal membaca file client!','error');
+      pendingClientData = null;
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function mergeClientData(){
+  if(!pendingClientData){toast('Tidak ada data untuk digabung','warning');return}
+  const data = pendingClientData;
+  const existTxns   = DB.get('transactions') || [];
+  const existShifts = DB.get('shifts') || [];
+  const existIds    = new Set(existTxns.map(t=>t.id));
+  const shiftIds    = new Set(existShifts.map(s=>s.id));
+
+  // Merge transactions — only add new ones
+  const newTxns = (data.transactions||[]).filter(t=>!existIds.has(t.id));
+  const merged  = [...newTxns, ...existTxns];
+  // Sort by date desc
+  merged.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  DB.set('transactions', merged);
+
+  // Merge shifts
+  const newShifts = (data.shifts||[]).filter(s=>!shiftIds.has(s.id));
+  const mergedShifts = [...newShifts, ...existShifts];
+  mergedShifts.sort((a,b)=>new Date(b.startTime)-new Date(a.startTime));
+  DB.set('shifts', mergedShifts);
+
+  // Log
+  const sh = DB.get('sync_history')||[];
+  sh.unshift({type:'server-import',date:new Date().toISOString(),
+    desc:`Gabung ${newTxns.length} transaksi + ${newShifts.length} shift dari ${data.meta.branchName||data.meta.branchId}`,
+    by:currentUser?.name||''});
+  DB.set('sync_history', sh.slice(0,50));
+
+  addSyncLog(`✅ [SERVER] Gabung selesai: +${newTxns.length} transaksi, +${newShifts.length} shift dari ${data.meta.branchName||''}`);
+  pendingClientData = null;
+  document.getElementById('server-import-preview').classList.add('hidden');
+  document.getElementById('server-merge-btn').disabled = true;
+  renderServerStats();
+  renderSyncHistory();
+  toast(`✅ Berhasil gabungkan ${newTxns.length} transaksi baru!`, 'success', 4000);
+}
+
+// ── CLIENT FUNCTIONS ─────────────────────────────────────────
+
+function renderClientPendingInfo(){
+  const lastSync = DB.get('last_client_sync') || null;
+  const txns = DB.get('transactions') || [];
+  const shifts = DB.get('shifts') || [];
+  let pendingTxns, pendingShifts;
+  if(lastSync){
+    pendingTxns   = txns.filter(t=>new Date(t.date) > new Date(lastSync)).length;
+    pendingShifts = shifts.filter(s=>new Date(s.startTime) > new Date(lastSync)).length;
+  } else {
+    pendingTxns   = txns.length;
+    pendingShifts = shifts.length;
+  }
+  const el = document.getElementById('client-pending-info');
+  if(!el) return;
+  el.innerHTML = `
+    <div>${pendingTxns} transaksi · ${pendingShifts} shift</div>
+    <div style="margin-top:2px">Sync terakhir: <strong>${lastSync ? new Date(lastSync).toLocaleString('id-ID') : 'Belum pernah'}</strong></div>
+  `;
+}
+
+function exportForServer(){
+  const onlyNew = document.getElementById('client-only-new').checked;
+  const lastSync = DB.get('last_client_sync') || null;
+  let txns   = DB.get('transactions') || [];
+  let shifts = DB.get('shifts') || [];
+  if(onlyNew && lastSync){
+    txns   = txns.filter(t=>new Date(t.date) > new Date(lastSync));
+    shifts = shifts.filter(s=>new Date(s.startTime) > new Date(lastSync));
+  }
+  const pkg = {
+    meta:{
+      type:'client',
+      version:'2.0.0',
+      app:'POSku',
+      exportDate: new Date().toISOString(),
+      exportedBy: currentUser?.name||'',
+      branchId: currentBranch?.id||'b1',
+      branchName: currentBranch?.name||'',
+      onlyNew, lastSync
+    },
+    transactions: txns,
+    shifts: shifts
+  };
+  const now = new Date().toISOString();
+  const fname = `posku_client_${currentBranch?.code||'CBG'}_${now.slice(0,10)}.json`;
+  downloadFile(fname, JSON.stringify(pkg, null, 2), 'application/json');
+  // Update last sync timestamp
+  DB.set('last_client_sync', now);
+  const sh = DB.get('sync_history')||[];
+  sh.unshift({type:'client-export',date:now,
+    desc:`Kirim ke server: ${txns.length} transaksi, ${shifts.length} shift → ${fname}`,
+    by:currentUser?.name||''});
+  DB.set('sync_history', sh.slice(0,50));
+  addSyncLog(`📤 [CLIENT] Export ke server → ${fname} (${txns.length} transaksi)`);
+  renderClientPendingInfo();
+  renderSyncHistory();
+  toast(`${txns.length} transaksi berhasil diexport untuk server!`, 'success');
+}
+
+function previewServerData(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(data.meta?.type !== 'master'){
+        toast('Bukan file master dari server! Pastikan pakai "Export Data Master"','error');
+        e.target.value=''; return;
+      }
+      pendingServerData = data;
+      const prodCount  = (data.products||[]).length;
+      const catCount   = (data.categories||[]).length;
+      const userCount  = (data.users||[]).length;
+      const hasSettings= !!data.settings;
+
+      document.getElementById('client-import-preview').innerHTML = `
+        <div style="font-weight:700;margin-bottom:6px;color:var(--text)">📋 Preview dari Server Pusat</div>
+        <div style="color:var(--text-muted)">Tanggal export: ${new Date(data.meta.exportDate).toLocaleString('id-ID')}</div>
+        <div style="color:var(--text-muted)">Dikirim oleh: ${data.meta.exportedBy||'-'}</div>
+        <hr style="margin:8px 0;border:none;border-top:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
+          <div>Produk: <strong style="color:var(--primary)">${prodCount}</strong></div>
+          <div>Kategori: <strong>${catCount}</strong></div>
+          <div>Pengguna: <strong>${userCount}</strong></div>
+          <div>Pengaturan: <strong>${hasSettings?'✅':'—'}</strong></div>
+        </div>
+        <div style="margin-top:8px;padding:6px 10px;background:#FFFBEB;border-radius:6px;font-size:11px;color:#92400E">
+          ⚠️ Data lokal (produk, user, pengaturan) akan ditimpa. Transaksi tidak terpengaruh.
+        </div>
+      `;
+      document.getElementById('client-import-preview').classList.remove('hidden');
+      document.getElementById('client-apply-btn').disabled = false;
+      addSyncLog(`📂 [CLIENT] File server dibaca: ${file.name} (${prodCount} produk)`);
+    }catch{
+      toast('Gagal membaca file server!','error');
+      pendingServerData = null;
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function applyServerData(){
+  if(!pendingServerData){toast('Tidak ada data untuk diterapkan','warning');return}
+  confirmAction('Terapkan update dari server? Produk, kategori, pengguna, dan pengaturan lokal akan diperbarui. Riwayat transaksi tidak berubah.', ()=>{
+    const data = pendingServerData;
+    // Apply only what was included in the master package
+    if(data.settings){
+      // Keep local logo if server doesn't have one
+      const localS = DB.get('settings')||{};
+      data.settings.logo = data.settings.logo || localS.logo;
+      DB.set('settings', data.settings);
+    }
+    if(data.products)    DB.set('products',    data.products);
+    if(data.categories)  DB.set('categories',  data.categories);
+    if(data.users)       DB.set('users',        data.users);
+    if(data.branches)    DB.set('branches',     data.branches);
+
+    const now = new Date().toISOString();
+    DB.set('last_client_sync', now);
+    const sh = DB.get('sync_history')||[];
+    sh.unshift({type:'client-import',date:now,
+      desc:`Terima update server: ${(data.products||[]).length} produk, ${(data.users||[]).length} user`,
+      by:currentUser?.name||''});
+    DB.set('sync_history', sh.slice(0,50));
+
+    addSyncLog(`✅ [CLIENT] Update server diterapkan: ${(data.products||[]).length} produk, ${(data.users||[]).length} user`);
+    pendingServerData = null;
+    document.getElementById('client-import-preview').classList.add('hidden');
+    document.getElementById('client-apply-btn').disabled = true;
+    renderSyncHistory();
+    renderClientPendingInfo();
+    toast('✅ Update dari server berhasil diterapkan!','success',4000);
+    // Refresh UI with new data
+    setTimeout(()=>{applySettings();renderPosProducts();},300);
+  });
+}
+
+// ── SHARED ────────────────────────────────────────────────────
+
+function renderSyncHistory(){
+  const el = document.getElementById('sync-history-list');
+  if(!el) return;
+  const sh = DB.get('sync_history')||[];
+  if(!sh.length){
+    el.innerHTML='<div style="color:var(--text-muted);padding:8px 0">Belum ada riwayat sinkronisasi</div>';
+    return;
+  }
+  const icons = {'server-export':'📤','server-import':'📥','client-export':'📤','client-import':'📥'};
+  const colors = {'server-export':'#1D4ED8','server-import':'#065F46','client-export':'#7C3AED','client-import':'#92400E'};
+  el.innerHTML = sh.slice(0,10).map(h=>`
+    <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start">
+      <span style="font-size:16px;flex-shrink:0;margin-top:1px">${icons[h.type]||'🔄'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:${colors[h.type]||'var(--text)'}">${h.desc}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:1px">${new Date(h.date).toLocaleString('id-ID')} · ${h.by||'-'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function addSyncLog(msg){
+  const el = document.getElementById('sync-log');
+  if(!el) return;
+  // Remove placeholder if present
+  const placeholder = el.querySelector('div[style*="color:var(--text-light)"]');
+  if(placeholder) placeholder.remove();
+  const d = document.createElement('div');
+  const color = msg.startsWith('✅')?'#065F46':msg.startsWith('❌')?'#991B1B':msg.startsWith('⚠️')?'#92400E':'var(--text-muted)';
+  d.innerHTML = `<span style="color:var(--text-light)">[${new Date().toLocaleTimeString()}]</span> <span style="color:${color}">${msg}</span>`;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+  // Keep last 100 lines
+  while(el.children.length > 100) el.removeChild(el.firstChild);
+}
+
+function clearSyncLog(){
+  const el = document.getElementById('sync-log');
+  if(el) el.innerHTML = '<div style="color:var(--text-light)">— Log dihapus —</div>';
+}
+
+// Legacy backup (still accessible for full backup)
 function backupData(){
   const data={
-    meta:{version:'2.0.0',app:'POSku',exportDate:new Date().toISOString(),exportedBy:currentUser?.name||''},
-    settings:DB.get('settings'),
-    branches:DB.get('branches'),
-    users:DB.get('users'),
-    categories:DB.get('categories'),
-    products:DB.get('products'),
-    transactions:DB.get('transactions'),
-    shifts:DB.get('shifts')
+    meta:{type:'fullbackup',version:'2.0.0',app:'POSku',exportDate:new Date().toISOString(),exportedBy:currentUser?.name||''},
+    settings:DB.get('settings'),branches:DB.get('branches'),users:DB.get('users'),
+    categories:DB.get('categories'),products:DB.get('products'),
+    transactions:DB.get('transactions'),shifts:DB.get('shifts')
   };
-  downloadFile('posku_backup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2),'application/json');
-  addSyncLog('✅ Backup berhasil - '+new Date().toLocaleString());
+  downloadFile('posku_fullbackup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2),'application/json');
+  addSyncLog('💾 Full backup didownload');
   toast(t('backupSuccess'),'success');
 }
+
 function restoreData(e){
   const file=e.target.files[0];
   if(!file) return;
@@ -2980,15 +3455,15 @@ function restoreData(e){
     try{
       const data=JSON.parse(ev.target.result);
       if(!data.meta||data.meta.app!=='POSku'){toast('File backup tidak valid!','error');return}
-      confirmAction(`Restore data dari backup ${data.meta.exportDate?.slice(0,10)||''}? Semua data saat ini akan diganti!`,()=>{
-        if(data.settings) DB.set('settings',data.settings);
-        if(data.branches) DB.set('branches',data.branches);
-        if(data.users) DB.set('users',data.users);
-        if(data.categories) DB.set('categories',data.categories);
-        if(data.products) DB.set('products',data.products);
+      confirmAction(`Restore full backup dari ${data.meta.exportDate?.slice(0,10)||''}? Semua data akan diganti!`,()=>{
+        if(data.settings)     DB.set('settings',data.settings);
+        if(data.branches)     DB.set('branches',data.branches);
+        if(data.users)        DB.set('users',data.users);
+        if(data.categories)   DB.set('categories',data.categories);
+        if(data.products)     DB.set('products',data.products);
         if(data.transactions) DB.set('transactions',data.transactions);
-        if(data.shifts) DB.set('shifts',data.shifts);
-        addSyncLog('📥 Restore berhasil dari backup '+data.meta.exportDate?.slice(0,10));
+        if(data.shifts)       DB.set('shifts',data.shifts);
+        addSyncLog('📥 Full restore selesai dari '+data.meta.exportDate?.slice(0,10));
         toast(t('restoreSuccess'),'success');
         setTimeout(()=>location.reload(),1500);
       });
@@ -2996,14 +3471,6 @@ function restoreData(e){
   };
   reader.readAsText(file);
   e.target.value='';
-}
-function addSyncLog(msg){
-  const el=document.getElementById('sync-log');
-  if(!el) return;
-  const d=document.createElement('div');
-  d.textContent=`[${new Date().toLocaleTimeString()}] ${msg}`;
-  el.appendChild(d);
-  el.scrollTop=el.scrollHeight;
 }
 
 // ============================================================
