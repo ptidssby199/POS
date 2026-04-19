@@ -1501,7 +1501,7 @@ const DB = {
 // ============================================================
 function initData(){
   // Reset init if version doesn't match (forces permission fix)
-  if(DB.get('init') && DB.get('init') !== 'v2'){
+  if(DB.get('init') && DB.get('init') !== 'v3'){
     DB.del('init');
   }
   if(!DB.get('init')){
@@ -1547,32 +1547,11 @@ function initData(){
       {id:'p7',name:'Keripik',price:10000,cost:5000,categoryId:'c3',stock:60,unit:'bungkus',barcode:'',icon:'🍿',imgData:null,active:true,desc:''},
       {id:'p8',name:'Coklat Bar',price:12000,cost:6000,categoryId:'c3',stock:45,unit:'pcs',barcode:'',icon:'🍫',imgData:null,active:true,desc:''}
     ]);
-    // Sample transactions
-    const now = Date.now();
-    const txns = [];
-    for(let i=0;i<20;i++){
-      const d = new Date(now - i*3600000*Math.floor(Math.random()*24+1));
-      txns.push({
-        id:'t'+Date.now()+i,
-        date:d.toISOString(),
-        items:[
-          {productId:'p1',name:'Nasi Goreng',price:25000,qty:Math.ceil(Math.random()*3),unit:'porsi'},
-          {productId:'p4',name:'Es Teh Manis',price:8000,qty:Math.ceil(Math.random()*2),unit:'gelas'}
-        ],
-        subtotal:0,discount:0,discountType:'nominal',tax:0,total:0,
-        paymentMethod:'cash',cashReceived:0,change:0,
-        kasirId:'u1',kasirName:'Admin',branchId:'b1',shiftId:null,note:''
-      });
-      const t = txns[txns.length-1];
-      t.subtotal = t.items.reduce((s,it)=>s+it.price*it.qty,0);
-      t.total = t.subtotal;
-      t.cashReceived = Math.ceil(t.total/10000)*10000;
-      t.change = t.cashReceived - t.total;
-    }
-    DB.set('transactions',txns);
+    DB.set('transactions',[]);
     DB.set('shifts',[]);
     DB.set('held',[]);
-    DB.set('init','v2');
+    DB.set('txn_counter',0);
+    DB.set('init','v3');
   }
 }
 
