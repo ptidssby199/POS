@@ -111,6 +111,16 @@ posku/
 
 ## 📋 Changelog
 
+### v2.0.1 (2025)
+- ✅ Fitur Retur / Void transaksi
+- ✅ Retur sebagian item dengan pilihan qty
+- ✅ Stok otomatis kembali saat void/retur
+- ✅ Metode pengembalian dana (tunai/transfer/dll)
+- ✅ Cetak nota retur ke printer thermal
+- ✅ Riwayat & log retur per transaksi
+- ✅ Export log retur ke CSV
+- ✅ Badge status di tabel transaksi
+
 ### v2.0.0 (2025)
 - ✅ Session persist — tetap login setelah refresh browser
 - ✅ Sinkronisasi dua arah Server ↔ Client (smart merge)
